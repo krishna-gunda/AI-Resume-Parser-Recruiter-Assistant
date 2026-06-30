@@ -13,7 +13,10 @@ from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 import vectordb
 from vectordb.chromadb import creating_embeddings
-
+import retriever
+from retriever.chroma_retriever import retriever
+import query
+from query.query import retrieve_documents
 
 
 
@@ -33,7 +36,20 @@ def main():
 
     print("Number of vectors:", len(collection["embeddings"]))
     print("Dimensions of first vector:", len(collection["embeddings"][0]))
-     
+
+
+    print("===================================================================================")
+
+    related_ans = retriever(vector_db)
+
+    query = "What is the highest qualification of Krishna?"
+
+    docs = retrieve_documents(related_ans, query)
+
+    for i, chunk in enumerate(docs, start=1):
+        print(f"\nChunk {i}")
+        print(chunk.page_content)
+
 
     
 
