@@ -1,5 +1,4 @@
 import os
-import shutil
 from embeddings.openai_embeddings import embedding_model
 from langchain_chroma import Chroma
 
@@ -8,15 +7,23 @@ def creating_embeddings(chunks):
     # Path where ChromaDB is stored
     db_path = "./vectordb/chroma_db"
 
-    # Delete the existing database if it already exists
-    if os.path.exists(db_path):
-        shutil.rmtree(db_path)
-        print("Previous vector database deleted successfully.")
-
     # Load the embedding model
     model = embedding_model()
 
-    # Create a new vector database
+    # If the vector database already exists, load it
+    if os.path.exists(db_path):
+        print("Existing vector database found. Loading embeddings...")
+
+        vector_db = Chroma(
+            persist_directory=db_path,
+            embedding_function=model
+        )
+
+        return vector_db
+
+    # Otherwise, create a new vector database
+    print("No existing vector database found. Creating embeddings...")
+
     vector_db = Chroma.from_documents(
         documents=chunks,
         embedding=model,

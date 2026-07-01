@@ -19,7 +19,8 @@ import models
 from models.chat_openai_model import chat_model
 import prompts
 from prompts.prompt_template import resume_prompt
-
+import chains
+from chains.retrieval_chain import retrieval_chain
 
 load_dotenv()
 open_api_key = os.getenv("OPENAI_API_KEY")
@@ -43,19 +44,21 @@ def main():
 
     retriever_obj = retriever(vector_db)
 
-    question = "What is the highest qualification of Krishna?"
+    llm = chat_model()
 
-    docs = retrieve_documents(retriever_obj, question)
+    prompt = resume_prompt()
 
-    for i, chunk in enumerate(docs, start=1):
-        print(f"\nChunk {i}")
-        print(chunk.page_content)
+    rag_chain = retrieval_chain(
+    retriever=retriever_obj,
+    prompt=prompt,
+    llm=llm)
+    
 
+    question = "What is the college name that krishna studied"
 
-    openai_model=chat_model()
-      
-    prompt=resume_prompt()
+    response = rag_chain.invoke(question)
 
+    print(response)
     
 
 if __name__ == "__main__":
