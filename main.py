@@ -1,7 +1,6 @@
 import warnings
 warnings.filterwarnings("ignore")
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 import loaders
 from loaders.pdf_loader import loader
 import splitter
@@ -10,14 +9,16 @@ import embeddings
 from embeddings.openai_embeddings import embedding_model
 import os
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
 import vectordb
 from vectordb.chromadb import creating_embeddings
 import retriever
 from retriever.chroma_retriever import retriever
 import query
 from query.query import retrieve_documents
-
+import models
+from models.chat_openai_model import chat_model
+import prompts
+from prompts.prompt_template import resume_prompt
 
 
 load_dotenv()
@@ -40,16 +41,20 @@ def main():
 
     print("===================================================================================")
 
-    related_ans = retriever(vector_db)
+    retriever_obj = retriever(vector_db)
 
-    query = "What is the highest qualification of Krishna?"
+    question = "What is the highest qualification of Krishna?"
 
-    docs = retrieve_documents(related_ans, query)
+    docs = retrieve_documents(retriever_obj, question)
 
     for i, chunk in enumerate(docs, start=1):
         print(f"\nChunk {i}")
         print(chunk.page_content)
 
+
+    openai_model=chat_model()
+      
+    prompt=resume_prompt()
 
     
 
